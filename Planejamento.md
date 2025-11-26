@@ -144,4 +144,24 @@ CREATE TABLE url_analytics (
 - **Cache**: Redis (para performance no redirecionamento) -> **Nao sera utilizado no momento**
 - **Deploy**: Docker + servidor cloud -> **Docker**
 
-Quer que eu detalhe alguma parte específica ou ajuste alguma coisa nesse planejamento?
+## Estrutura do projeto
+
+src/main/java/br/urlgz/app/
+    config/
+        SwaggerConfig.java
+    controller/
+        UrlController.java
+    service/
+        UrlService.java
+    repository/
+        UrlRepository.java
+    model/
+        Url.java
+    dto/
+        UrlDto.java
+    mapper/
+        UrlMapper.java
+    exception/
+        ErrorHandler.java
+        ErrorApi.java
+    UrlGzApplication.java
