@@ -10,7 +10,7 @@ description = 'Api encurtadora de URL urlgz'
 
 java {
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
+		languageVersion = JavaLanguageVersion.of(21)
 	}
 }
 

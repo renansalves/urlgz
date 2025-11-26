@@ -1,0 +1,13 @@
+CREATE DATABASE IF NOT EXISTS urglgz;
+
+USE urglgz;
+
+CREATE TABLE IF NOT EXISTS shortened_urls (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    short_code VARCHAR(10) UNIQUE NOT NULL,
+    original_url TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NULL,
+    click_count BIGINT DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE
+);

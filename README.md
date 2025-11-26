@@ -1,109 +1,75 @@
-# Planejamento para API de Encurtador de URLs
+# 🔗 URLGZ 🔗
+---
+🔗
+Api responsavel por encurtar urls longas. Realiza o encurtamento da url, garantindo que ela seja a mais curta possivel, e redireciona para url original sempre que for requisitado a url curta. 
+🔗
 
-## 📋 **Épicos Principais**
+### 💻 tecnologias utilizadas
 
-### 1. **Épico: Gerenciamento de URLs**
-#### Histórias de Usuário:
-- **HU01**: Como usuário, quero encurtar uma URL longa para obter uma URL curta
-- **HU02**: Como usuário, quero que minha URL encurtada redirecione para a URL original
-- **HU03**: Como usuário, quero personalizar o código da URL encurtada (opcional)
-- **HU04**: Como usuário, quero definir data de expiração para minha URL (opcional)
+* **linguagem:** java 21
+* **framework:** spring boot 3.x
+* **gerenciador de dependências:** Gradle
+* **banco de dados:** MariaDb 
+* **persistência:** spring data jpa / hibernate
+* **Testes:** JUnit 5, Mockito (com 'org.mockito:mockito-core:5.+')
+* **documentação:** springdoc openapi (swagger ui)
+* **Container:** Docker
+### ⚙️ pré-requisitos
 
-#### Tarefas Técnicas:
-- [ ] Modelar entidade URL no banco de dados
-- [ ] Implementar endpoint POST `/api/shorten`
-- [ ] Implementar endpoint GET `/{shortCode}`
-- [ ] Criar serviço de geração de códigos curtos
-- [ ] Implementar validação de URLs
+para executar a api localmente, você precisará ter instalado:
 
-### 2. **Épico: Analytics e Métricas**
-#### Histórias de Usuário:
-- **HU05**: Como usuário, quero visualizar estatísticas de acesso das minhas URLs
-- **HU06**: Como usuário, quero ver de onde vêm os acessos (geolocalização)
+1.  **java development kit (jdk):** versão 21 ou superior.
+    ```bash
+    java -version
+    ```
+2.  **Gradlew:** Gerenciador de dependencias.
 
-#### Tarefas Técnicas:
-- [ ] Criar tabela de analytics/estatísticas
-- [ ] Implementar tracking de cliques
-- [ ] Criar endpoint GET `/api/urls/{shortCode}/stats`
-- [ ] Implementar coleta de dados do usuário (IP, user-agent)
+### 🚀 instalação e execução
 
-### 3. **Épico: Gestão de URLs**
-#### Histórias de Usuário:
-- **HU07**: Como usuário, quero listar minhas URLs encurtadas
-- **HU08**: Como usuário, quero desativar uma URL encurtada
-- **HU09**: Como usuário, quero editar o destino de uma URL encurtada
+1.  **clonar o repositório:**
+    ```bash
+    git clone [https://github.com/renansalves/urlgz.git](https://github.com/renansalves/urlgz.git)
+    cd api-pessoas
+    ```
 
-#### Tarefas Técnicas:
-- [ ] Implementar endpoint GET `/api/urls`
-- [ ] Implementar endpoint PUT `/api/urls/{shortCode}`
-- [ ] Implementar endpoint DELETE `/api/urls/{shortCode}`
+2.  **Configurar Banco de Dados (Opcional):**
+    O projeto utiliza o **H2 em memória** por padrão. Para usar o PostgreSQL ou outro banco de sua preferencia, edite o arquivo `src/main/resources/application.yml` e configure as credenciais:
+    
+    ```yaml
+    # Exemplo de configuração (YAML):
+    spring:
+      datasource:
+        url: jdbc:postgresql://localhost:5432/api_pessoas_db 
+        username: seu_usuario 
+        password: sua_senha
+    ```
+3.  **compilar e empacotar (build):**
+    ```bash
+    ./gradlew build
+    ```
 
-### 4. **Épico: Segurança e Validação**
-#### Histórias de Usuário:
-- **HU10**: Como usuário, quero que URLs maliciosas sejam bloqueadas
-- **HU11**: Como administrador, quero limitar taxa de requisições por usuário
+4.  **executar a aplicação:**
+    ```bash
+    ./gradlew bootRun
+    # a aplicação estará rodando em http://localhost:8080
+    ```
 
-#### Tarefas Técnicas:
-- [ ] Implementar validação contra URLs maliciosas
-- [ ] Configurar rate limiting
-- [ ] Implementar sanitização de URLs
-- [ ] Criar blacklist de domínios
+### 🧭 uso da api (endpoints principais)
 
-## 🚀 **Sprint 1: MVP (Minimum Viable Product)**
+a api é acessível em `http://localhost:8080` (porta padrão).
 
-### Objetivo: Funcionalidade básica de encurtamento
+| método | endpoint | descrição |
+| :--- | :--- | :--- |
+| **post** | `/api/urls` | cria um novo registro de pessoa. |
+| **get** | `/api/urls/{shortCode}` | busca uma pessoa pelo id. |
+| **delete** | `/api/urls/{shortCode}` | deleta uma pessoa pelo id. |
 
-**Tarefas Prioritárias:**
-1. **Configuração do Projeto**
-   - [ ] Setup do ambiente de desenvolvimento
-   - [ ] Configuração do banco de dados
-   - [ ] Estrutura básica da API
+**exemplo de requisição (post /api/v1/shorten):**
 
-2. **Funcionalidades Core**
-   - [ ] Modelo de dados para URLs
-   - [ ] Endpoint de encurtamento (`POST /api/shorten`)
-   - [ ] Endpoint de redirecionamento (`GET /{shortCode}`)
-   - [ ] Geração de código curto único
-
-3. **Validações Básicas**
-   - [ ] Validar formato da URL
-   - [ ] Verificar se URL é acessível
-   - [ ] Prevenir duplicação de códigos curtos
-
-## 🗄️ **Modelo de Dados Sugerido**
-
-```sql
--- Tabela principal de URLs
-CREATE TABLE shortened_urls (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    short_code VARCHAR(10) UNIQUE NOT NULL,
-    original_url TEXT NOT NULL,
-    custom_code BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP NULL,
-    click_count BIGINT DEFAULT 0,
-    is_active BOOLEAN DEFAULT TRUE
-);
-
--- Tabela de estatísticas
-CREATE TABLE url_analytics (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    short_code VARCHAR(10) NOT NULL,
-    accessed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    ip_address VARCHAR(45),
-    user_agent TEXT,
-    referrer VARCHAR(500),
-    country VARCHAR(100)
-);
-```
-
-## 🔧 **Endpoints da API**
-
-### **POST /api/shorten**
+### **POST /api/v1/shorten**
 ```json
 {
   "url": "https://exemplo.com/pagina-muito-longa",
-  "customCode": "meulink", // opcional
   "expiresIn": "30d" // opcional
 }
 ```
@@ -122,25 +88,26 @@ CREATE TABLE url_analytics (
 }
 ```
 
-## 📊 **Critérios de Aceitação**
 
-### Para HU01 (Encurtar URL):
+### 📄 Documentação (Swagger UI)
+
+* A documentação interativa da API, gerada automaticamente pelo Springdoc, pode ser acessada em: `http://localhost:8080/swagger-ui.html`
+
+### 🎯 Funcionalidades e Requisitos
+
+#### Encurtar URL:
 - [ ] URL válida retorna código curto
 - [ ] URL inválida retorna erro 400
 - [ ] Código curto é único
 - [ ] Resposta inclui URL encurtada completa
 
-### Para HU02 (Redirecionar):
+#### Redirecionar:
 - [ ] Código válido redireciona para URL original
 - [ ] Código inválido retorna 404
 - [ ] URLs expiradas retornam 410
 - [ ] Contador de cliques é incrementado
 
-## 🛠️ **Tecnologias Sugeridas**
+### 📝 Trabalho Futuro (TODO)
 
-- **Backend**: Node.js/Express, Python/FastAPI, ou Java/Spring Boot
-- **Banco**: PostgreSQL ou MySQL
-- **Cache**: Redis (para performance no redirecionamento)
-- **Deploy**: Docker + servidor cloud
-
-Quer que eu detalhe alguma parte específica ou ajuste alguma coisa nesse planejamento?
+* [X] 🚧 .
+* [X] 📈 .
