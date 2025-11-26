@@ -7,5 +7,4 @@ ENV MARIADB_PASSWORD="root"
 
 COPY ./src/main/resources/init.sql /docker-entrypoint-initdb.d/init.sql
 
-# Expose the default MariaDB port
 EXPOSE 3306
