@@ -33,8 +33,8 @@ para executar a api localmente, você precisará ter instalado:
     ```
 
 2.  **Configurar Banco de Dados (Opcional):**
-    O projeto utiliza o **H2 em memória** por padrão. Para usar o PostgreSQL ou outro banco de sua preferencia, edite o arquivo `src/main/resources/application.yml` e configure as credenciais:
-    
+    O projeto utiliza **MariaDB**, que pode ser alterado para outros bancos. Para usar o PostgreSQL ou outro banco de sua preferencia, edite o arquivo `src/main/resources/application.yml` e configure as credenciais:
+
     ```yaml
     # Exemplo de configuração (YAML):
     spring:
