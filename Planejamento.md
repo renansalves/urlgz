@@ -156,7 +156,7 @@ src/main/java/br/urlgz/app/
     repository/
         UrlRepository.java
     model/
-        Url.java
+        UrlEntity.java
     dto/
         UrlDto.java
     mapper/
