@@ -2,6 +2,7 @@ package br.urlgz.app.service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,16 +35,18 @@ public class UrlService {
   /**
    * Metodo responsavel pela codificação da URL.
    * Realiza a codificação da url utilizando a classe base62
+   * 
    * @see {@link br.urlgz.app.utils.Base62}
    * 
    * @author Renan Alves
    *
    * @param urlRequest String - String contendo a url a ser encurtada.
-   * @param expiresIn LocalDateTime- Data de expiração do link encurtado.
+   * @param expiresIn  LocalDateTime- Data de expiração do link encurtado.
    *
-   * <p>
-   * Valor de retorno da chamada POST /api/v1/shorten.
-   * <pre>{@code
+   *                   <p>
+   *                   Valor de retorno da chamada POST /api/v1/shorten.
+   * 
+   *                   <pre>{@code
    *  {
    *    "url": "https://exemplo.com/pagina-muito-longa",
    *    "expiresIn": "30d" // opcional
@@ -52,24 +55,32 @@ public class UrlService {
    *
    */
 
-  public UrlResponse urlShortEncode(UrlRequest urlRequest ) {
+  public UrlResponse urlShortEncode(UrlRequest urlRequest) {
 
-    // Deve encurtar a url e salvar os dados no banco.
-    long id = 0;
-    String shortCode = Base62.encode(id);
-    UrlEntity urlEntity = new UrlEntity();
+    UrlEntity urlEntity = urlMapperInterface.toEntity(urlRequest);
 
-    urlEntity.setShortCode(shortCode);
-    urlEntity.setOriginalUrl(urlRequest.url());
     urlEntity.setCreatedAt(LocalDateTime.now());
     urlEntity.setExpiresAt(LocalDateTime.now().plusDays(30));
+
+
+    UrlEntity savedEntity = urlRepository.save(urlEntity);
     
-    String shortUrl = BASESHORTURL+shortCode;
 
-    UrlResponse urlResponse = urlMapperInterface.responseToDto(urlRepository.save(urlEntity));
-    UrlResponse result = new UrlResponse(urlResponse.shortCode(), urlResponse.originalUrl(), shortUrl, urlResponse.createdAt(),urlResponse.totalClicks());
+    long obfuscatedId = savedEntity.getId() * 1000L + ThreadLocalRandom.current().nextInt(1000, 999999999);
 
-    return result;
+    urlEntity.setShortCode(Base62.encode(obfuscatedId));
+    
+    UrlResponse urlResponse = urlMapperInterface.responseToDto(savedEntity);
+
+    String shortUrl = BASESHORTURL + urlEntity.getShortCode();
+
+    return new UrlResponse(
+        urlResponse.shortCode(),
+        urlResponse.originalUrl(),
+        shortUrl,
+        urlResponse.createdAt(),
+        urlResponse.totalClicks()
+    );
 
   }
 
