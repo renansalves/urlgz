@@ -1,6 +1,8 @@
 package br.urlgz.app.service;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +20,7 @@ import static org.mockito.Mockito.when;
 import br.urlgz.app.dto.UrlResponse;
 import br.urlgz.app.dto.UrlRequest;
 import br.urlgz.app.repository.UrlRepository;
+import br.urlgz.app.utils.Base62;
 import br.urlgz.app.mapper.UrlMapperInterface;
 import br.urlgz.app.model.UrlEntity;
 import br.urlgz.app.builder.UrlBuilder;
@@ -56,15 +59,17 @@ public class UrlServiceTest {
   @Test
   void DeveTransformarUrlLongaEmCurta() {
         when(urlMapperiInterface.toEntity(urlRequest)).thenReturn(urlEntity); 
-    //    when(urlRepository.save(any(UrlEntity.class))).thenReturn(urlEntity);
-     //   when(urlMapperiInterface.responseToDto(urlEntity)).thenReturn(urlBuilder.createUrlResponse()); 
+        when(urlRepository.save(any(UrlEntity.class))).thenReturn(urlEntity);
+        when(urlMapperiInterface.responseToDto(urlEntity)).thenReturn(urlBuilder.createUrlResponse()); 
 
         UrlResponse resultado = urlService.urlShortEncode(urlRequest); 
 
         assertNotNull(resultado);
-      //  verify(urlMapperiInterface, times(1)).toEntity(urlRequest);
-       // verify(urlRepository, times(1)).save(urlEntity); 
-        //verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
+        assertTrue(resultado.shortUrl().startsWith("https://localhost:8080/"));
+        assertEquals(resultado.shortCode(),this.urlResponse.shortCode());
+        verify(urlMapperiInterface, times(1)).toEntity(urlRequest);
+        verify(urlRepository, times(1)).save(urlEntity); 
+        verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
 
   }
 }
