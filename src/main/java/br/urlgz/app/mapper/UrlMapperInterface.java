@@ -8,10 +8,12 @@ import br.urlgz.app.dto.UrlRequest;
 @Mapper(componentModel = "spring")
 public interface UrlMapperInterface {
 
-  UrlEntity toDto(UrlEntity urlModel);
+  UrlResponse responseToDto(UrlEntity urlModel);
 
-  UrlResponse toEntity(UrlResponse urlResponse);
+  UrlEntity toEntity(UrlResponse urlResponse);
 
-  UrlRequest toEntity(UrlRequest urlRequest);
+  UrlRequest RequestToDto(UrlEntity urlModel);
+
+  UrlEntity toEntity(UrlRequest urlRequest);
 
 }

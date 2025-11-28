@@ -1,6 +1,7 @@
 package br.urlgz.app.model;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,8 +15,6 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
-@Setter
 @Entity
 public class UrlEntity {
 
@@ -38,5 +37,47 @@ public class UrlEntity {
  private int clickCount;
  @Column(name="is_active", columnDefinition="Boolean default 'true'")
  private Boolean isActive;
+ public Long getId() {
+	return id;
+ }
+ public void setId(Long id) {
+	this.id = id;
+ }
+ public LocalDateTime getCreatedAt() {
+	return createdAt;
+ }
+ public void setCreatedAt(LocalDateTime createdAt) {
+	this.createdAt = createdAt;
+ }
+ public LocalDateTime getExpiresAt() {
+	return expiresAt;
+ }
+ public void setExpiresAt(LocalDateTime expiresAt) {
+	this.expiresAt = expiresAt;
+ }
+ public String getShortCode() {
+	return shortCode;
+ }
+ public void setShortCode(String shortCode) {
+	this.shortCode = shortCode;
+ }
+ public String getOriginalUrl() {
+	return originalUrl;
+ }
+ public void setOriginalUrl(String originalUrl) {
+	this.originalUrl = originalUrl;
+ }
+ public int getClickCount() {
+	return clickCount;
+ }
+ public void setClickCount(int clickCount) {
+	this.clickCount = clickCount;
+ }
+ public Boolean getIsActive() {
+	return isActive;
+ }
+ public void setIsActive(Boolean isActive) {
+	this.isActive = isActive;
+ }
 
 }

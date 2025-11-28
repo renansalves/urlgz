@@ -24,13 +24,10 @@ import br.urlgz.app.mapper.UrlMapperInterface;
 public class UrlService {
 
   @Autowired
-  private Base62 base62;
+  private UrlRepository urlRepository;
 
   @Autowired
-  private Urlrepository urlRepository;
-
-  @Autowired
-  private UrlMapperInterface urlMapperInterface; 
+  private UrlMapperInterface urlMapperInterface;
 
   /**
    * Metodo responsavel pela codificação da URL.
@@ -52,48 +49,45 @@ public class UrlService {
    * }</pre>
    *
    */
-  public UrlResponse urlShortEncode(String url, Optional<LocalDateTime> expireDate ) {
+
+  public UrlResponse urlShortEncode(String url ) {
 
     // Deve encurtar a url e salvar os dados no banco.
     long id = 0;
-    String shortCode = base62.encode(id);
+    String shortCode = Base62.encode(id);
 
-  UrlEntity urlEntity = new UrlEntity();
-  urlEntity.setShortCode(shortCode);
-  urlentity.setoriginalurl(url);
-  urlEntity.setCreatedAt(LocalDateTime.now())
-  if (expireDate.isEmpty() || expireDate == null){
-    urlEntity.setExpireDate(LocalDateTime.now().plusDays(30));
-  }else{
-    urlEntity.setExpireDate(expireDate);
-  }
-  return urlMapperInterface.toDto(urlRepository.save(urlEntity));
+    UrlEntity urlEntity = new UrlEntity();
 
-  return null;
+    urlEntity.setShortCode(shortCode);
+    urlEntity.setOriginalUrl(url);
+    urlEntity.setCreatedAt(LocalDateTime.now());
+    urlEntity.setExpiresAt(LocalDateTime.now().plusDays(30));
+
+    return urlMapperInterface.responseToDto(urlRepository.save(urlEntity));
 
   }
-
 
   /**
-   * Metodo responsavel pela consulta da URL curta, e redirecionamento da url original.
+   * Metodo responsavel pela consulta da URL curta, e redirecionamento da url
+   * original.
    * 
    * @author Renan Alves
-   * @param shortCode String - String contendo a url a ser encurtada.
-   * @param originalUrl String - Data de expiração do link encurtado.
-   * @param createdAt LocalDateTime - Data de expiração do link encurtado.
-   * @param totalClicks longlong - Data de expiração do link encurtado.
+   * @param shortCode        String - String contendo a url a ser encurtada.
+   * @param originalUrl      String - Data de expiração do link encurtado.
+   * @param createdAt        LocalDateTime - Data de expiração do link encurtado.
+   * @param totalClicks      longlong - Data de expiração do link encurtado.
    * @param clicksLast30Days Long - Data de expiração do link encurtado.
-   * ### **GET /api/urls/{shortCode}**
+   *                         ### **GET /api/urls/{shortCode}**
    * @return
-   * ```json
-   *  {
-   *    "shortCode": "abc123",
-   *    "originalUrl": "https://...",
-   *    "createdAt": "2024-01-01T00:00:00Z",
-   *    "totalClicks": 150,
-   *    "clicksLast30Days": 45
-   *  }
-   *  ```
+   *         ```json
+   *         {
+   *         "shortCode": "abc123",
+   *         "originalUrl": "https://...",
+   *         "createdAt": "2024-01-01T00:00:00Z",
+   *         "totalClicks": 150,
+   *         "clicksLast30Days": 45
+   *         }
+   *         ```
    */
 
   public UrlResponse searchOriginalUrl(String shortUrl) {
@@ -106,13 +100,13 @@ public class UrlService {
    * 
    * @author Renan Alves
    * @param shortCode String - String contendo a url a ser encurtada.
-   * ```json
-   *  {
-   *    "shortCode": "abc123",
-   *  }
-   *  ```
+   *                  ```json
+   *                  {
+   *                  "shortCode": "abc123",
+   *                  }
+   *                  ```
    */
-  public void deleteShortlUrlData(Long id){
+  public void deleteShortlUrlData(Long id) {
 
   }
 }
