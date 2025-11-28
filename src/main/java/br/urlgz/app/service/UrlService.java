@@ -109,6 +109,7 @@ public class UrlService {
 
   public UrlResponse searchOriginalUrl(String shortUrl) {
 
+    UrlEntity savedUrl = urlRepository.findByShortCode(shortUrl);
     return null;
   }
 

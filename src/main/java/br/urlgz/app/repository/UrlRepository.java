@@ -5,5 +5,7 @@ import br.urlgz.app.model.UrlEntity;
 
 public interface UrlRepository extends JpaRepository<UrlEntity, Long> {
 
+    UrlEntity findByShortCode(String shortUrl);
+
   
 }
