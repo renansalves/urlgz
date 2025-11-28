@@ -57,19 +57,23 @@ public class UrlServiceTest {
     this.urlResponse = this.urlBuilder.createUrlResponse();
   }
   @Test
-  void DeveTransformarUrlLongaEmCurta() {
+  void ShouldTransformALongUrlToAShortUrl() {
         when(urlMapperiInterface.toEntity(urlRequest)).thenReturn(urlEntity); 
         when(urlRepository.save(any(UrlEntity.class))).thenReturn(urlEntity);
         when(urlMapperiInterface.responseToDto(urlEntity)).thenReturn(urlBuilder.createUrlResponse()); 
 
-        UrlResponse resultado = urlService.urlShortEncode(urlRequest); 
+        UrlResponse result = urlService.urlShortEncode(urlRequest); 
 
-        assertNotNull(resultado);
-        assertTrue(resultado.shortUrl().startsWith("https://localhost:8080/"));
-        assertEquals(resultado.shortCode(),this.urlResponse.shortCode());
+        assertNotNull(result);
+        assertTrue(result.shortUrl().startsWith("https://localhost:8080/"));
+        assertEquals(result.shortCode(),this.urlResponse.shortCode());
         verify(urlMapperiInterface, times(1)).toEntity(urlRequest);
         verify(urlRepository, times(1)).save(urlEntity); 
         verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
-
+  }
+   
+  @Test
+  void ShouldReturnTheUrFromCorrespondingCode(){
+    
   }
 }
