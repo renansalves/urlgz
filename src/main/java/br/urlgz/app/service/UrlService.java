@@ -1,10 +1,17 @@
 package br.urlgz.app.service;
 
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.urlgz.app.dto.UrlResponse;
+import br.urlgz.app.dto.UrlRequest;
 import br.urlgz.app.utils.Base62;
+import br.urlgz.app.model.UrlEntity;
+import br.urlgz.app.repository.UrlRepository;
+import br.urlgz.app.mapper.UrlMapperInterface;
 
 /**
  * Classe UrlService, responsavel em proverer as principais funcionalidades para
@@ -17,9 +24,13 @@ import br.urlgz.app.utils.Base62;
 public class UrlService {
 
   @Autowired
-  private UrlResponse urlResponse;
-  @Autowired
   private Base62 base62;
+
+  @Autowired
+  private Urlrepository urlRepository;
+
+  @Autowired
+  private UrlMapperInterface urlMapperInterface; 
 
   /**
    * Metodo responsavel pela codificação da URL.
@@ -41,15 +52,27 @@ public class UrlService {
    * }</pre>
    *
    */
-  public UrlResponse urlShortEncode(String url) {
+  public UrlResponse urlShortEncode(String url, Optional<LocalDateTime> expireDate ) {
 
     // Deve encurtar a url e salvar os dados no banco.
     long id = 0;
-    String urlResponse = base62.encode(id);
+    String shortCode = base62.encode(id);
 
-    return null;
+  UrlEntity urlEntity = new UrlEntity();
+  urlEntity.setShortCode(shortCode);
+  urlentity.setoriginalurl(url);
+  urlEntity.setCreatedAt(LocalDateTime.now())
+  if (expireDate.isEmpty() || expireDate == null){
+    urlEntity.setExpireDate(LocalDateTime.now().plusDays(30));
+  }else{
+    urlEntity.setExpireDate(expireDate);
+  }
+  return urlMapperInterface.toDto(urlRepository.save(urlEntity));
+
+  return null;
 
   }
+
 
   /**
    * Metodo responsavel pela consulta da URL curta, e redirecionamento da url original.
@@ -77,7 +100,6 @@ public class UrlService {
 
     return null;
   }
-
 
   /**
    * Metodo responsavel pela remoção dos registros no banco.
