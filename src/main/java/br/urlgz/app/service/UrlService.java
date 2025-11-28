@@ -29,6 +29,8 @@ public class UrlService {
   @Autowired
   private UrlMapperInterface urlMapperInterface;
 
+  private static final String BASESHORTURL = "https://localhost:8080/";
+
   /**
    * Metodo responsavel pela codificação da URL.
    * Realiza a codificação da url utilizando a classe base62
@@ -36,7 +38,7 @@ public class UrlService {
    * 
    * @author Renan Alves
    *
-   * @param url String - String contendo a url a ser encurtada.
+   * @param urlRequest String - String contendo a url a ser encurtada.
    * @param expiresIn LocalDateTime- Data de expiração do link encurtado.
    *
    * <p>
@@ -50,20 +52,24 @@ public class UrlService {
    *
    */
 
-  public UrlResponse urlShortEncode(String url ) {
+  public UrlResponse urlShortEncode(UrlRequest urlRequest ) {
 
     // Deve encurtar a url e salvar os dados no banco.
     long id = 0;
     String shortCode = Base62.encode(id);
-
     UrlEntity urlEntity = new UrlEntity();
 
     urlEntity.setShortCode(shortCode);
-    urlEntity.setOriginalUrl(url);
+    urlEntity.setOriginalUrl(urlRequest.url());
     urlEntity.setCreatedAt(LocalDateTime.now());
     urlEntity.setExpiresAt(LocalDateTime.now().plusDays(30));
+    
+    String shortUrl = BASESHORTURL+shortCode;
 
-    return urlMapperInterface.responseToDto(urlRepository.save(urlEntity));
+    UrlResponse urlResponse = urlMapperInterface.responseToDto(urlRepository.save(urlEntity));
+    UrlResponse result = new UrlResponse(urlResponse.shortCode(), urlResponse.originalUrl(), shortUrl, urlResponse.createdAt(),urlResponse.totalClicks());
+
+    return result;
 
   }
 

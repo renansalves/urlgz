@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 public record UrlResponse(
     String shortCode,
     String originalUrl,
+    String shortUtl,
     LocalDateTime createdAt,
     long totalClicks
     ) {
