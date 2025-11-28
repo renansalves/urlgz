@@ -1,6 +1,6 @@
 package br.urlgz.app.dto;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -11,5 +11,5 @@ public record UrlRequest(
   @NotBlank
   String url,
   @DateTimeFormat()
-  LocalTime expiresIn
+  LocalDateTime expiresIn
     ) {}

@@ -6,7 +6,6 @@ public record UrlResponse(
     String shortCode,
     String originalUrl,
     LocalDateTime createdAt,
-    long totalClicks,
-    int clicksLast30Days
+    long totalClicks
     ) {
 }
