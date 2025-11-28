@@ -31,6 +31,7 @@ import br.urlgz.app.builder.UrlBuilder;
 
   // shortcode -> 5 caracteres 62^5 -> 916.132.832 URLS distintas
   // Função hash, hasids
+@ExtendWith(MockitoExtension.class)
 public class UrlServiceTest {
 
   @InjectMocks
