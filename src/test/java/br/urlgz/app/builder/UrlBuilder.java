@@ -7,7 +7,7 @@ import br.urlgz.app.dto.*;
 public class UrlBuilder {
 
     private Long id = 101010L;
-    private String url = "Joao Pedro";
+    private String url = "https://www.urlmuitolonga/esta/e/uma/url/longa";
     private LocalDateTime expiredAt = LocalDateTime.now().plusDays(30);
     private LocalDateTime createdAt = LocalDateTime.now();
     private String shortCode = "qhc";
