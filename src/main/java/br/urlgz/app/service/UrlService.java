@@ -110,7 +110,10 @@ public class UrlService {
   public UrlResponse searchOriginalUrl(String shortUrl) {
 
     UrlEntity savedUrl = urlRepository.findByShortCode(shortUrl);
-    return null;
+
+    UrlResponse response = urlMapperInterface.responseToDto(savedUrl);
+
+    return response;
   }
 
   /**

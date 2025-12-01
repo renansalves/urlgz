@@ -3,7 +3,6 @@ package br.urlgz.app.service;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +15,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.time.temporal.ChronoUnit;
 
 import br.urlgz.app.dto.UrlResponse;
 import br.urlgz.app.dto.UrlRequest;
@@ -74,6 +75,21 @@ public class UrlServiceTest {
    
   @Test
   void ShouldReturnTheUrFromCorrespondingCode(){
-    
+        when(urlRepository.findByShortCode(this.urlEntity.getShortCode())).thenReturn(this.urlEntity);
+        when(urlMapperiInterface.responseToDto(this.urlEntity)).thenReturn(this.urlResponse);
+
+        UrlResponse result = urlService.searchOriginalUrl(this.urlEntity.getShortCode());
+
+        assertNotNull(result);
+        assertEquals(this.urlEntity.getOriginalUrl(), result.originalUrl());
+
+        assertEquals(result.createdAt().truncatedTo(ChronoUnit.SECONDS),this.urlEntity.getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
+
+        assertEquals(this.urlEntity.getClickCount(), result.totalClicks());
+        verify(urlRepository, times(1)).findByShortCode(this.urlEntity.getShortCode());
+        verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
+   
   }
+
+
 }

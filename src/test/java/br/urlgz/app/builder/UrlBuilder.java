@@ -51,7 +51,7 @@ public class UrlBuilder {
     }
 
     public UrlEntity createUrlEntity() {
-        return new UrlEntity(this.id, this.expiredAt, LocalDateTime.now().plusDays(30), this.shortCode, this.url, this.totalClicks, this.isActive);
+        return new UrlEntity(this.id, this.shortCode, this.url, this.totalClicks, this.isActive);
     }
 
     public UrlRequest createUrlRequest() {

@@ -38,47 +38,16 @@ public class UrlEntity {
  private int clickCount;
  @Column(name="is_active", columnDefinition="Boolean default 'true'")
  private Boolean isActive;
- public Long getId() {
-	return id;
- }
- public void setId(Long id) {
+
+ public UrlEntity(Long id, String shortCode, String originalUrl, int clickCount, Boolean isActive) {
 	this.id = id;
- }
- public LocalDateTime getCreatedAt() {
-	return createdAt;
- }
- public void setCreatedAt(LocalDateTime createdAt) {
-	this.createdAt = createdAt;
- }
- public LocalDateTime getExpiresAt() {
-	return expiresAt;
- }
- public void setExpiresAt(LocalDateTime expiresAt) {
-	this.expiresAt = expiresAt;
- }
- public String getShortCode() {
-	return shortCode;
- }
- public void setShortCode(String shortCode) {
 	this.shortCode = shortCode;
- }
- public String getOriginalUrl() {
-	return originalUrl;
- }
- public void setOriginalUrl(String originalUrl) {
 	this.originalUrl = originalUrl;
- }
- public int getClickCount() {
-	return clickCount;
- }
- public void setClickCount(int clickCount) {
 	this.clickCount = clickCount;
- }
- public Boolean getIsActive() {
-	return isActive;
- }
- public void setIsActive(Boolean isActive) {
 	this.isActive = isActive;
+  this.createdAt = LocalDateTime.now();
+  this.expiresAt = LocalDateTime.now().plusDays(30);
  }
+
 
 }
