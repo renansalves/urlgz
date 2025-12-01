@@ -1,6 +1,7 @@
 package br.urlgz.app.service;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -28,15 +29,6 @@ import br.urlgz.app.mapper.UrlMapperInterface;
 import br.urlgz.app.model.UrlEntity;
 import br.urlgz.app.builder.UrlBuilder;
 
-  // Testes da service, função salvar, consultar, deletar. Função hash para
-  // criação da url encurtada e unica.
-  // 1 - Teste função Hash
-  // 2 - Teste função Salvar
-  // 3 - Teste função Consultar
-  // 4 - Teste função Deletar.
-
-  // shortcode -> 5 caracteres 62^5 -> 916.132.832 URLS distintas
-  // Função hash, hasids
 @ExtendWith(MockitoExtension.class)
 public class UrlServiceTest {
 
@@ -44,7 +36,7 @@ public class UrlServiceTest {
   private UrlService urlService;
   @Mock
   UrlRepository urlRepository;
-  @Mock 
+  @Mock
   UrlMapperInterface urlMapperiInterface;
 
   UrlEntity urlEntity;
@@ -53,60 +45,98 @@ public class UrlServiceTest {
   UrlBuilder urlBuilder;
 
   @BeforeEach
-  void setup(){
+  void setup() {
     urlBuilder = new UrlBuilder();
     this.urlEntity = this.urlBuilder.createUrlEntity();
     this.urlRequest = this.urlBuilder.createUrlRequest();
     this.urlResponse = this.urlBuilder.createUrlResponse();
   }
-  @Test
+
+  @Test()
   void ShouldTransformALongUrlToAShortUrl() {
-        when(urlMapperiInterface.toEntity(urlRequest)).thenReturn(urlEntity); 
-        when(urlRepository.save(any(UrlEntity.class))).thenReturn(urlEntity);
-        when(urlMapperiInterface.responseToDto(urlEntity)).thenReturn(urlBuilder.createUrlResponse()); 
+    when(urlMapperiInterface.toEntity(urlRequest)).thenReturn(urlEntity);
+    when(urlRepository.save(any(UrlEntity.class))).thenReturn(urlEntity);
+    when(urlMapperiInterface.responseToDto(urlEntity)).thenReturn(urlBuilder.createUrlResponse());
 
-        UrlResponse result = urlService.urlShortEncode(urlRequest); 
+    UrlResponse result = urlService.urlShortEncode(urlRequest);
 
-        assertNotNull(result);
-        assertTrue(result.shortUrl().startsWith("https://localhost:8080/"));
-        assertEquals(result.shortCode(),this.urlResponse.shortCode());
-        verify(urlMapperiInterface, times(1)).toEntity(urlRequest);
-        verify(urlRepository, times(1)).save(urlEntity); 
-        verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
+    assertNotNull(result);
+    assertTrue(result.shortUrl().startsWith("https://localhost:8080/"));
+    assertEquals(result.shortCode(), this.urlResponse.shortCode());
+    verify(urlMapperiInterface, times(1)).toEntity(urlRequest);
+    verify(urlRepository, times(2)).save(urlEntity);
+    verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
   }
-   
+
   @Test
-  void ShouldReturnTheUrFromCorrespondingCode(){
-        when(urlRepository.findByShortCode(this.urlEntity.getShortCode())).thenReturn(this.urlEntity);
-        when(urlMapperiInterface.responseToDto(this.urlEntity)).thenReturn(this.urlResponse);
+  void ShouldReturnTheUrlFromCorrespondingCode() {
+    when(urlRepository.findByShortCode(this.urlEntity.getShortCode())).thenReturn(this.urlEntity);
+    when(urlMapperiInterface.responseToDto(this.urlEntity)).thenReturn(this.urlResponse);
 
-        UrlResponse result = urlService.searchOriginalUrl(this.urlEntity.getShortCode());
+    UrlResponse result = urlService.searchOriginalUrl(this.urlEntity.getShortCode());
 
-        assertNotNull(result);
-        assertEquals(this.urlEntity.getOriginalUrl(), result.originalUrl());
+    assertNotNull(result);
+    assertEquals(this.urlEntity.getOriginalUrl(), result.originalUrl());
 
-        assertEquals(result.createdAt().truncatedTo(ChronoUnit.SECONDS),this.urlEntity.getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
+    assertEquals(result.createdAt().truncatedTo(ChronoUnit.SECONDS),
+        this.urlEntity.getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
 
-        assertEquals(this.urlEntity.getClickCount(), result.totalClicks());
-        verify(urlRepository, times(1)).findByShortCode(this.urlEntity.getShortCode());
-        verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
-   
+    assertEquals(this.urlEntity.getClickCount(), result.totalClicks());
+    verify(urlRepository, times(1)).findByShortCode(this.urlEntity.getShortCode());
+    verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
+
   }
+
   @Test
-  void ShouldDeleteAnShortUrlEntity(){
+  void ShouldDeleteAnShortUrlEntity() {
     Long id = this.urlEntity.getId();
 
     when(urlRepository.existsById(id)).thenReturn(true);
     doNothing().when(urlRepository).deleteById(id);
-    
-    assertDoesNotThrow(() ->{
-        urlService.deleteShortlUrlData(id);
-    });
 
+    assertDoesNotThrow(() -> {
+      urlService.deleteShortlUrlData(id);
+    });
 
     verify(urlRepository, times(1)).existsById(id);
     verify(urlRepository, times(1)).deleteById(id);
   }
 
+  @Test
+  void ShouldThrowExceptionWhenShortCodeDoesNotExist() {
 
+    when(urlRepository.findByShortCode("invalid")).thenReturn(null);
+
+    RuntimeException ex = assertThrows(RuntimeException.class, () -> {
+      urlService.searchOriginalUrl("invalid");
+    });
+
+    assertEquals("Não foi possivel consultar a url curta.", ex.getMessage());
+    verify(urlMapperiInterface, times(0)).responseToDto(any());
+  }
+
+  @Test
+  void ShouldThrowExceptionWhenSavingFails(){
+    when(urlMapperiInterface.toEntity(urlRequest)).thenThrow(new RuntimeException("Mapping error"));
+
+    RuntimeException ex = assertThrows(RuntimeException.class, () -> {
+      urlService.urlShortEncode(urlRequest);
+    });
+
+    assertEquals("Não foi possivel salvar a url.", ex.getMessage());
+    verify(urlRepository, times(0)).save(any());
+  }
+
+  @Test
+  void ShouldThrowExceptionWhenIdDoesNotExist() {
+    Long id = this.urlEntity.getId();
+
+    when(urlRepository.existsById(id)).thenReturn(false);
+
+    Exception exception = assertThrows(RuntimeException.class, () -> {
+      urlService.deleteShortlUrlData(id);
+    });
+    assertEquals("URL com ID " + id + " não encontrada.", exception.getMessage());
+    verify(urlRepository, times(0)).deleteById(id);
+  }
 }

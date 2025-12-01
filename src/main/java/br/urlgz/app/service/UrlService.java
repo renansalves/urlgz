@@ -56,34 +56,38 @@ public class UrlService {
    *
    */
 
-  public UrlResponse urlShortEncode(UrlRequest urlRequest) {
 
-    UrlEntity urlEntity = urlMapperInterface.toEntity(urlRequest);
+public UrlResponse urlShortEncode(UrlRequest urlRequest) {
+    try {
+        UrlEntity urlEntity = urlMapperInterface.toEntity(urlRequest);
 
-    urlEntity.setCreatedAt(LocalDateTime.now());
-    urlEntity.setExpiresAt(LocalDateTime.now().plusDays(30));
+        urlEntity.setCreatedAt(LocalDateTime.now());
+        urlEntity.setExpiresAt(LocalDateTime.now().plusDays(30));
 
+        UrlEntity savedEntity = urlRepository.save(urlEntity);
+        if (savedEntity == null) {
+            throw new RuntimeException("Não foi possivel salvar a url.");
+        }
 
-    UrlEntity savedEntity = urlRepository.save(urlEntity);
-    
+        long obfuscatedId = savedEntity.getId() * 1000L + ThreadLocalRandom.current().nextInt(1000, 999999999);
+        savedEntity.setShortCode(Base62.encode(obfuscatedId));
 
-    long obfuscatedId = savedEntity.getId() * 1000L + ThreadLocalRandom.current().nextInt(1000, 999999999);
+        savedEntity = urlRepository.save(savedEntity);
 
-    urlEntity.setShortCode(Base62.encode(obfuscatedId));
-    
-    UrlResponse urlResponse = urlMapperInterface.responseToDto(savedEntity);
+        UrlResponse urlResponse = urlMapperInterface.responseToDto(savedEntity);
+        String shortUrl = BASESHORTURL + savedEntity.getShortCode();
 
-    String shortUrl = BASESHORTURL + urlEntity.getShortCode();
-
-    return new UrlResponse(
-        urlResponse.shortCode(),
-        urlResponse.originalUrl(),
-        shortUrl,
-        urlResponse.createdAt(),
-        urlResponse.totalClicks()
-    );
-
-  }
+        return new UrlResponse(
+            urlResponse.shortCode(),
+            urlResponse.originalUrl(),
+            shortUrl,
+            urlResponse.createdAt(),
+            urlResponse.totalClicks()
+        );
+    } catch (Exception e) {
+        throw new RuntimeException("Não foi possivel salvar a url.");
+    }
+}
 
   /**
    * Metodo responsavel pela consulta da URL curta, e redirecionamento da url
@@ -107,14 +111,14 @@ public class UrlService {
    *         }
    *         ```
    */
-
   public UrlResponse searchOriginalUrl(String shortUrl) {
 
     UrlEntity savedUrl = urlRepository.findByShortCode(shortUrl);
+    if (savedUrl == null) {
+      throw new RuntimeException("Não foi possivel consultar a url curta.");
+    }
+    return urlMapperInterface.responseToDto(savedUrl);
 
-    UrlResponse response = urlMapperInterface.responseToDto(savedUrl);
-
-    return response;
   }
 
   /**
@@ -129,9 +133,9 @@ public class UrlService {
    *                  ```
    */
   public void deleteShortlUrlData(Long id) {
-    if (urlRepository.existsById(id)){
+    if (urlRepository.existsById(id)) {
       urlRepository.deleteById(id);
-    }else{
+    } else {
       throw new EntityNotFoundException("URL com ID " + id + " não encontrada.");
     }
   }
