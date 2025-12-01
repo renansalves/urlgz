@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Table(name = "url_entity")
 @Getter
 @Setter
 public class UrlEntity {
@@ -34,8 +36,8 @@ public class UrlEntity {
 
  @Column(name="original_url", nullable = false)
  private String originalUrl;
- @Column(name="click_count", columnDefinition="Integer default '0'")
- private int clickCount;
+ @Column(name="click_count", nullable = false)
+ private int clickCount = 0;
  @Column(name="is_active", nullable=false)
  private Boolean isActive = true;
 

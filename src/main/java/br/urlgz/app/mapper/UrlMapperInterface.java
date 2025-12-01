@@ -1,6 +1,8 @@
 package br.urlgz.app.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
 import br.urlgz.app.model.UrlEntity;
 import br.urlgz.app.dto.UrlResponse;
 import br.urlgz.app.dto.UrlRequest;
@@ -10,10 +12,10 @@ public interface UrlMapperInterface {
 
   UrlResponse responseToDto(UrlEntity urlModel);
 
-  UrlEntity toEntity(UrlResponse urlResponse);
+  @Mapping(source = "originalUrl", target = "url")
+  UrlRequest requestToDto(UrlEntity urlModel);
 
-  UrlRequest RequestToDto(UrlEntity urlModel);
-
+  @Mapping(source = "url", target = "originalUrl")
   UrlEntity toEntity(UrlRequest urlRequest);
 
 }

@@ -13,5 +13,5 @@ public record UrlRequest(
   String url,
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   @Future
-  LocalDateTime expiresIn
+  LocalDateTime expiresAt
     ) {}
