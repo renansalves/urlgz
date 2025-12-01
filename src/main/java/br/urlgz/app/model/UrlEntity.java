@@ -36,8 +36,8 @@ public class UrlEntity {
  private String originalUrl;
  @Column(name="click_count", columnDefinition="Integer default '0'")
  private int clickCount;
- @Column(name="is_active", columnDefinition="Boolean default 'true'")
- private Boolean isActive;
+ @Column(name="is_active", nullable=false)
+ private Boolean isActive = true;
 
  public UrlEntity(Long id, String shortCode, String originalUrl, int clickCount, Boolean isActive) {
 	this.id = id;

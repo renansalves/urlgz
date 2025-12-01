@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ErrorHandler {
 
   @ExceptionHandler(RuntimeException.class)
-  public ResponseEntity<ApiError> UrlRuntimeExceptionHandler(6){
+  public ResponseEntity<ApiError> UrlRuntimeExceptionHandler(){
     ApiError error = new ApiError(
         "Não foi possivel salvar a url.",
         HttpStatus.BAD_REQUEST.value(),
