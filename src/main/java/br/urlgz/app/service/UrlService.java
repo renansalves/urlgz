@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import br.urlgz.app.dto.UrlResponse;
 import br.urlgz.app.dto.UrlRequest;
 import br.urlgz.app.utils.Base62;
+import jakarta.persistence.EntityNotFoundException;
 import br.urlgz.app.model.UrlEntity;
 import br.urlgz.app.repository.UrlRepository;
 import br.urlgz.app.mapper.UrlMapperInterface;
@@ -128,6 +129,10 @@ public class UrlService {
    *                  ```
    */
   public void deleteShortlUrlData(Long id) {
-
+    if (urlRepository.existsById(id)){
+      urlRepository.deleteById(id);
+    }else{
+      throw new EntityNotFoundException("URL com ID " + id + " não encontrada.");
+    }
   }
 }

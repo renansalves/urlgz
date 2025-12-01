@@ -2,6 +2,7 @@ package br.urlgz.app.service;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 
 import br.urlgz.app.dto.UrlResponse;
 import br.urlgz.app.dto.UrlRequest;
@@ -89,6 +91,21 @@ public class UrlServiceTest {
         verify(urlRepository, times(1)).findByShortCode(this.urlEntity.getShortCode());
         verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
    
+  }
+  @Test
+  void ShouldDeleteAnShortUrlEntity(){
+    Long id = this.urlEntity.getId();
+
+    when(urlRepository.existsById(id)).thenReturn(true);
+    doNothing().when(urlRepository).deleteById(id);
+    
+    assertDoesNotThrow(() ->{
+        urlService.deleteShortlUrlData(id);
+    });
+
+
+    verify(urlRepository, times(1)).existsById(id);
+    verify(urlRepository, times(1)).deleteById(id);
   }
 
 
