@@ -1,4 +1,4 @@
-package br.urlgz.app.builder;
+package br.urlgz.app.builderTest;
 
 import java.time.LocalDateTime;
 import br.urlgz.app.model.UrlEntity;
@@ -20,7 +20,6 @@ public class UrlBuilder {
         return new UrlBuilder();
     }
 
-    // Métodos para customização
     public UrlBuilder withId(Long id) {
         this.id = id;
         return this;

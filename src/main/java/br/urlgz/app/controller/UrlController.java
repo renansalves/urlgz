@@ -1,8 +1,6 @@
 package br.urlgz.app.controller;
 
 import java.net.URI;
-import java.time.LocalDateTime;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,8 +13,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
-
 import br.urlgz.app.service.UrlService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,9 +20,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+
+import br.urlgz.app.handler.ErrorHandler;
 import br.urlgz.app.dto.UrlRequest;
 import br.urlgz.app.dto.UrlResponse;
-import br.urlgz.app.handler.ErrorHandler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,27 +69,18 @@ public class UrlController {
     return ResponseEntity.ok(response);
   }
 
-  @Operation(
-  summary = "Redireciona para a URL longa a partir do shortcode.",
-  description = "Redireciona a URL longa a partir do shortcode fornecido.",
-  responses = {
-      @ApiResponse(
-        responseCode = "302",
-        description = "Redirecionamento para a URL longa."
-        ),
-      @ApiResponse(
-        responseCode = "404",
-        description = "URL não encontrada."
-        )
+  @Operation(summary = "Redireciona para a URL longa a partir do shortcode.", description = "Redireciona a URL longa a partir do shortcode fornecido.", responses = {
+      @ApiResponse(responseCode = "302", description = "Redirecionamento para a URL longa."),
+      @ApiResponse(responseCode = "404", description = "URL não encontrada.")
   })
   @GetMapping("/{shortcode}")
   public ResponseEntity<Void> redirectToOriginalUrl(@PathVariable String shortcode) {
-    UrlResponse urlEntity = urlService.searchOriginalUrl(shortcode);
-    if (urlEntity == null) {
+    UrlResponse urlResponse = urlService.searchOriginalUrl(shortcode);
+    if (urlResponse == null) {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    URI originalUrl = URI.create(urlEntity.originalUrl());
+    URI originalUrl = URI.create(urlResponse.originalUrl());
     return ResponseEntity.status(HttpStatus.FOUND).header(HttpHeaders.LOCATION, originalUrl.toString()).build();
   }
 

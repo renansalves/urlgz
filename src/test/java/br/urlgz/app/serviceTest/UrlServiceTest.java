@@ -1,17 +1,10 @@
-package br.urlgz.app.service;
+package br.urlgz.app.serviceTest;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -19,15 +12,21 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
-import br.urlgz.app.dto.UrlResponse;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import br.urlgz.app.builderTest.UrlBuilder;
 import br.urlgz.app.dto.UrlRequest;
-import br.urlgz.app.repository.UrlRepository;
-import br.urlgz.app.utils.Base62;
+import br.urlgz.app.dto.UrlResponse;
 import br.urlgz.app.mapper.UrlMapperInterface;
 import br.urlgz.app.model.UrlEntity;
-import br.urlgz.app.builder.UrlBuilder;
+import br.urlgz.app.repository.UrlRepository;
+import br.urlgz.app.service.UrlService;
 
 @ExtendWith(MockitoExtension.class)
 public class UrlServiceTest {
@@ -46,10 +45,10 @@ public class UrlServiceTest {
 
   @BeforeEach
   void setup() {
-    urlBuilder = new UrlBuilder();
-    this.urlEntity = this.urlBuilder.createUrlEntity();
-    this.urlRequest = this.urlBuilder.createUrlRequest();
-    this.urlResponse = this.urlBuilder.createUrlResponse();
+    this.urlBuilder = UrlBuilder.oneUrl();
+    this.urlEntity = UrlBuilder.oneUrl().createUrlEntity();
+    this.urlRequest = UrlBuilder.oneUrl().createUrlRequest();
+    this.urlResponse = UrlBuilder.oneUrl().createUrlResponse();
   }
 
   @Test()
@@ -63,10 +62,13 @@ public class UrlServiceTest {
     assertNotNull(result);
     assertTrue(result.shortUrl().startsWith("https://localhost:8080/"));
     assertEquals(result.shortCode(), this.urlResponse.shortCode());
+    assertEquals(result.originalUrl(), this.urlRequest.url());
+    assertEquals(result.createdAt().truncatedTo(ChronoUnit.SECONDS),
+            this.urlEntity.getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
+    assertEquals(result.totalClicks(), this.urlEntity.getClickCount());
     verify(urlMapperiInterface, times(1)).toEntity(urlRequest);
-    verify(urlRepository, times(2)).save(urlEntity);
-    verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);
-  }
+    verify(urlRepository, times(1)).save(urlEntity);
+    verify(urlMapperiInterface, times(1)).responseToDto(urlEntity);  }
 
   @Test
   void ShouldReturnTheUrlFromCorrespondingCode() {
@@ -123,7 +125,7 @@ public class UrlServiceTest {
       urlService.urlShortEncode(urlRequest);
     });
 
-    assertEquals("Não foi possivel salvar a url.{}", ex.getMessage());
+    assertEquals("Não foi possivel salvar a url.", ex.getMessage());
     verify(urlRepository, times(0)).save(any());
   }
 
