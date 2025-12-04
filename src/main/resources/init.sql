@@ -3,7 +3,7 @@ CREATE DATABASE IF NOT EXISTS urlgz;
 
 USE urlgz;
 
-CREATE TABLE IF NOT EXISTS shortened_urls (
+CREATE TABLE IF NOT EXISTS url_entity (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     short_code VARCHAR(10) UNIQUE NOT NULL,
     original_url TEXT NOT NULL,

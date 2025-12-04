@@ -123,7 +123,7 @@ public class UrlServiceTest {
       urlService.urlShortEncode(urlRequest);
     });
 
-    assertEquals("Não foi possivel salvar a url.", ex.getMessage());
+    assertEquals("Não foi possivel salvar a url.{}", ex.getMessage());
     verify(urlRepository, times(0)).save(any());
   }
 

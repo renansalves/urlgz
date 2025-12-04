@@ -14,29 +14,35 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class ErrorHandler {
 
-  @ExceptionHandler(RuntimeException.class)
-  public ResponseEntity<ApiError> UrlRuntimeExceptionHandler(){
-    ApiError error = new ApiError(
-        "Não foi possivel salvar a url.",
-        HttpStatus.BAD_REQUEST.value(),
-        LocalDateTime.now());
-    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
-  }
-  @ExceptionHandler(NotFoundException.class)
-  public ResponseEntity<ApiError> UrlNotFoundHandler(NotFoundException ex){
-      ApiError error = new ApiError(
-          ex.getMessage(),
-          HttpStatus.NOT_FOUND.value(),
-          LocalDateTime.now());
-      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
-  }
+ @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiError> handleRuntimeException(RuntimeException ex) {
+        ApiError error = new ApiError(
+                "An error occurred while processing the request.",
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                LocalDateTime.now(),
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
 
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ApiError> handleNotFoundException(NotFoundException ex) {
+        ApiError error = new ApiError(
+                "Resource not found.",
+                HttpStatus.NOT_FOUND.value(),
+                LocalDateTime.now(),
+                ex.getMessage()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
   @ExceptionHandler(EmptyResultDataAccessException.class)
   public ResponseEntity<ApiError> handleEmptyResultDataAccessException(EmptyResultDataAccessException ex){
     ApiError error = new ApiError(
         "Url não encontrada.",
         HttpStatus.NOT_FOUND.value(),
-        LocalDateTime.now());
+        LocalDateTime.now(),
+        ex.getMessage()
+        );
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
   }
 
@@ -51,7 +57,8 @@ public class ErrorHandler {
     ApiError error = new ApiError(
         "Erro de validação: " + errors,
         HttpStatus.INTERNAL_SERVER_ERROR.value(),
-        LocalDateTime.now()
+        LocalDateTime.now(),
+        ex.getMessage()
         );
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
@@ -62,7 +69,8 @@ public class ErrorHandler {
     ApiError error = new ApiError(
         "Ocorreu um erro inesperado. Contate o suporte.",
         HttpStatus.INTERNAL_SERVER_ERROR.value(),
-        LocalDateTime.now()
+        LocalDateTime.now(),
+        ex.getMessage()
         );
 
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);

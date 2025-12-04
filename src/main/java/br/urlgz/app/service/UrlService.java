@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.urlgz.app.dto.UrlResponse;
+import br.urlgz.app.handler.ErrorHandler;
 import br.urlgz.app.dto.UrlRequest;
 import br.urlgz.app.utils.Base62;
 import jakarta.persistence.EntityNotFoundException;
@@ -15,6 +16,8 @@ import br.urlgz.app.model.UrlEntity;
 import br.urlgz.app.repository.UrlRepository;
 import br.urlgz.app.mapper.UrlMapperInterface;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * Classe UrlService, responsavel em proverer as principais funcionalidades para
  * encurtar urls.
@@ -25,6 +28,7 @@ import br.urlgz.app.mapper.UrlMapperInterface;
 @Service
 public class UrlService {
 
+  private static final Logger logger = LoggerFactory.getLogger(ErrorHandler.class);
   @Autowired
   private UrlRepository urlRepository;
 
@@ -41,7 +45,7 @@ public class UrlService {
    * 
    * @author Renan Alves
    *
-   * @param urlRequest String - String contendo a url a ser encurtada.
+   * @param urlRequest UrlRequest - Objeto {@link br.urlgz.app.dto.UrlRequest} contendo a url a ser encurtada.
    * @param expiresIn  LocalDateTime- Data de expiração do link encurtado.
    *
    *                   <p>
@@ -64,15 +68,11 @@ public UrlResponse urlShortEncode(UrlRequest urlRequest) {
         urlEntity.setCreatedAt(LocalDateTime.now());
         urlEntity.setExpiresAt(LocalDateTime.now().plusDays(30));
 
+        long obfuscatedId =  1000L + ThreadLocalRandom.current().nextInt(1000, 999999999);
+
+        urlEntity.setShortCode(Base62.encode(obfuscatedId));
+          
         UrlEntity savedEntity = urlRepository.save(urlEntity);
-        if (savedEntity == null) {
-            throw new RuntimeException("Não foi possivel salvar a url.");
-        }
-
-        long obfuscatedId = savedEntity.getId() * 1000L + ThreadLocalRandom.current().nextInt(1000, 999999999);
-        savedEntity.setShortCode(Base62.encode(obfuscatedId));
-
-        savedEntity = urlRepository.save(savedEntity);
 
         UrlResponse urlResponse = urlMapperInterface.responseToDto(savedEntity);
         String shortUrl = BASESHORTURL + savedEntity.getShortCode();
@@ -85,7 +85,9 @@ public UrlResponse urlShortEncode(UrlRequest urlRequest) {
             urlResponse.totalClicks()
         );
     } catch (Exception e) {
-        throw new RuntimeException("Não foi possivel salvar a url.");
+        logger.error("Save error", e);
+        throw new RuntimeException("Não foi possivel salvar a url.{}"+e.getMessage(), e);
+
     }
 }
 
@@ -113,7 +115,9 @@ public UrlResponse urlShortEncode(UrlRequest urlRequest) {
    */
   public UrlResponse searchOriginalUrl(String shortUrl) {
 
+    logger.debug("Saving URL: {}", shortUrl);
     UrlEntity savedUrl = urlRepository.findByShortCode(shortUrl);
+
     if (savedUrl == null) {
       throw new RuntimeException("Não foi possivel consultar a url curta.");
     }

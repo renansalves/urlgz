@@ -1,5 +1,4 @@
 package br.urlgz.app.utils;
-
 public class Base62 {
 
   private static final String ALPHABET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
