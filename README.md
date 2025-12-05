@@ -96,14 +96,14 @@ a api é acessível em `http://localhost:8080` (porta padrão).
 ### 🎯 Funcionalidades e Requisitos
 
 #### Encurtar URL:
-- [ ] URL válida retorna código curto
-- [ ] URL inválida retorna erro 400
-- [ ] Código curto é único
-- [ ] Resposta inclui URL encurtada completa
+- [X] URL válida retorna código curto
+- [X] URL inválida retorna erro 400
+- [X] Código curto é único
+- [X] Resposta inclui URL encurtada completa
 
 #### Redirecionar:
-- [ ] Código válido redireciona para URL original
-- [ ] Código inválido retorna 404
+- [X] Código válido redireciona para URL original
+- [X] Código inválido retorna 404
 - [ ] URLs expiradas retornam 410
 - [ ] Contador de cliques é incrementado
 
